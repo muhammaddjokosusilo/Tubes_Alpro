@@ -12,7 +12,7 @@ Aplikasi digunakan untuk melakukan pemilihan umum calon legislatif dan partai te
 5. Pengguna bisa melakukan pencarian data calon yang berasal dari partai tertentu, pencarian berdasarkan nama calon, dan juga nama pemilih dari calon tertentu.
 
 ### Anggota Kelompok
-1. Aby Hakim Al Yasiry (2311102..)
-2. Haposan Felix Marcel Siregar (2311102..)
-3. Muhammad Djoko Susilo (2311102212)
-4. Tri Marselinus Sitanggang (2311102..)
+1. Muhammad Djoko Susilo (2311102212)
+2. Haposan Felix Marcel Siregar (2311102210)
+3. Tri Marselinus Sitanggang (2311102209)
+4. Aby Hakim Al Yasiry (2311102208)
