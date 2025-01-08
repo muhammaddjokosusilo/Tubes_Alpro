@@ -57,51 +57,37 @@ func (p *Pemilihan) TampilkanDaftarCalon() {
 	}
 }
 
-func (p *Pemilihan) UrutkanBerdasarkanSuara() {
-	n := len(p.DaftarCalon)
-	for i := 0; i < n-1; i++ {
-		swapped := false
-		for j := n - 2; j >= i; j-- {
-			if p.DaftarCalon[j].Suara < p.DaftarCalon[j+1].Suara {
-				// Tukar elemen jika suara lebih kecil
-				p.DaftarCalon[j], p.DaftarCalon[j+1] = p.DaftarCalon[j+1], p.DaftarCalon[j]
-				swapped = true
-			}
-		}
-		// Jika tidak ada elemen yang ditukar, sorting selesai
-		if !swapped {
-			break
-		}
-	}
-	p.TampilkanDaftarCalon()
-}
-
 func (p *Pemilihan) UrutkanBerdasarkanNama() {
 	n := len(p.DaftarCalon)
 	for i := 0; i < n-1; i++ {
-		swapped := false
-		for j := n - 2; j >= i; j-- {
+		for j := 0; j < n-i-1; j++ {
 			if p.DaftarCalon[j].Nama > p.DaftarCalon[j+1].Nama {
-				// Tukar elemen jika nama secara alfabet lebih besar
 				p.DaftarCalon[j], p.DaftarCalon[j+1] = p.DaftarCalon[j+1], p.DaftarCalon[j]
-				swapped = true
 			}
-		}
-		// Jika tidak ada elemen yang ditukar, sorting selesai
-		if !swapped {
-			break
 		}
 	}
 	p.TampilkanDaftarCalon()
 }
 
-func (p *Pemilihan) CariBerdasarkanPartai(partai string) {
-	fmt.Printf("Daftar Calon dari Partai %s:\n", partai)
+func (p *Pemilihan) TampilkanPemenang() {
+	if len(p.DaftarCalon) == 0 {
+		fmt.Println("Tidak ada calon dalam daftar.")
+		return
+	}
+	totalSuara := 0
 	for _, c := range p.DaftarCalon {
-		if c.Partai == partai {
-			fmt.Printf("%s - %d suara\n", c.Nama, c.Suara)
+		totalSuara += c.Suara
+	}
+
+	threshold := totalSuara/2 + 1
+	for _, c := range p.DaftarCalon {
+		if c.Suara >= threshold {
+			fmt.Println("Pemenang Pemilihan:")
+			fmt.Printf("%s (%s) - %d suara\n", c.Nama, c.Partai, c.Suara)
+			return
 		}
 	}
+	fmt.Println("Tidak ada pemenang yang memenuhi ambang batas.")
 }
 
 func (p *Pemilihan) CariBerdasarkanNamaCalon(nama string) {
@@ -109,6 +95,17 @@ func (p *Pemilihan) CariBerdasarkanNamaCalon(nama string) {
 	for _, c := range p.DaftarCalon {
 		if c.Nama == nama {
 			fmt.Printf("%s (%s) - %d suara\n", c.Nama, c.Partai, c.Suara)
+			fmt.Print("Apakah ingin memunculkan pemilih? (ya/tidak): ")
+			var jawaban string
+			fmt.Scan(&jawaban)
+			if jawaban == "ya" {
+				fmt.Println("Daftar Pemilih:")
+				for _, pemilih := range p.DaftarPemilih {
+					if pemilih.Pilihan == nama {
+						fmt.Println(pemilih.Nama)
+					}
+				}
+			}
 			return
 		}
 	}
@@ -125,24 +122,6 @@ func (p *Pemilihan) AturWaktuPemilihan(waktuMulai, waktuSelesai string) {
 		p.WaktuSelesai = selesai
 		fmt.Println("Waktu pemilihan berhasil diatur.")
 	}
-}
-
-func (p *Pemilihan) TampilkanPemenang() {
-	if len(p.DaftarCalon) == 0 {
-		fmt.Println("Tidak ada calon dalam daftar.")
-		return
-	}
-
-	// Asumsikan calon pertama sebagai pemenang
-	pemenang := p.DaftarCalon[0]
-	for _, c := range p.DaftarCalon {
-		if c.Suara > pemenang.Suara {
-			pemenang = c
-		}
-	}
-
-	fmt.Println("Pemenang Pemilihan:")
-	fmt.Printf("%s (%s) - %d suara\n", pemenang.Nama, pemenang.Partai, pemenang.Suara)
 }
 
 func (p *Pemilihan) ApakahPemilihanBuka() bool {
@@ -213,10 +192,9 @@ func menuPemilih(p *Pemilihan) {
 			fmt.Println("1. Berikan Suara")
 		}
 		fmt.Println("2. Tampilkan Daftar Calon")
-		fmt.Println("3. Cari Calon Berdasarkan Partai")
-		fmt.Println("4. Cari Calon Berdasarkan Nama")
-		fmt.Println("5. Tampilkan Pemenang")
-		fmt.Println("6. Keluar")
+		fmt.Println("3. Cari Calon Berdasarkan Nama")
+		fmt.Println("4. Tampilkan Pemenang")
+		fmt.Println("5. Keluar")
 		fmt.Print("Pilih opsi: ")
 		fmt.Scan(&pilihan)
 
@@ -233,20 +211,15 @@ func menuPemilih(p *Pemilihan) {
 				fmt.Println("Pemilihan belum dibuka.")
 			}
 		case 2:
-			p.TampilkanDaftarCalon()
+			p.UrutkanBerdasarkanNama()
 		case 3:
-			var partai string
-			fmt.Print("Masukkan nama partai: ")
-			fmt.Scan(&partai)
-			p.CariBerdasarkanPartai(partai)
-		case 4:
 			var nama string
 			fmt.Print("Masukkan nama calon: ")
 			fmt.Scan(&nama)
 			p.CariBerdasarkanNamaCalon(nama)
-		case 5:
+		case 4:
 			p.TampilkanPemenang()
-		case 6:
+		case 5:
 			return
 		default:
 			fmt.Println("Pilihan tidak valid. Coba lagi.")
