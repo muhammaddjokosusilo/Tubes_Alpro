@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 )
 
@@ -129,6 +130,35 @@ func (p *Pemilihan) ApakahPemilihanBuka() bool {
 	return sekarang.After(p.WaktuMulai) && sekarang.Before(p.WaktuSelesai)
 }
 
+func readStringInput(prompt string, regexPattern string) string {
+	var input string
+	re := regexp.MustCompile(regexPattern)
+	for {
+		fmt.Print(prompt)
+		fmt.Scan(&input)
+		if re.MatchString(input) {
+			break
+		}
+		fmt.Println("Input tidak valid. Harap masukkan sesuai format yang diizinkan.")
+	}
+	return input
+}
+
+func readIntInput(prompt string) int {
+	var input int
+	for {
+		fmt.Print(prompt)
+		_, err := fmt.Scan(&input)
+		if err == nil {
+			break
+		}
+		fmt.Println("Input tidak valid. Harap masukkan angka.")
+		var discard string
+		fmt.Scanln(&discard)
+	}
+	return input
+}
+
 func menuAdmin(p *Pemilihan) {
 	var pilihan int
 	for {
@@ -139,40 +169,31 @@ func menuAdmin(p *Pemilihan) {
 		fmt.Println("4. Atur Waktu Pemilihan")
 		fmt.Println("5. Tampilkan Daftar Calon")
 		fmt.Println("6. Keluar")
-		fmt.Print("Pilih opsi: ")
-		fmt.Scan(&pilihan)
+		pilihan = readIntInput("Pilih opsi: ")
 
 		switch pilihan {
 		case 1:
 			var nama, partai string
-			fmt.Print("Masukkan nama calon: ")
-			fmt.Scan(&nama)
-			fmt.Print("Masukkan partai calon: ")
-			fmt.Scan(&partai)
+			nama = readStringInput("Masukkan nama calon (hanya huruf): ", "^[a-zA-Z ]+$")
+			partai = readStringInput("Masukkan partai calon: ", "^.+$")
 			p.TambahCalon(nama, partai)
 		case 2:
 			var index int
 			var nama, partai string
 			p.TampilkanDaftarCalon()
-			fmt.Print("Masukkan nomor calon yang akan diedit: ")
-			fmt.Scan(&index)
-			fmt.Print("Masukkan nama baru: ")
-			fmt.Scan(&nama)
-			fmt.Print("Masukkan partai baru: ")
-			fmt.Scan(&partai)
+			index = readIntInput("Masukkan nomor calon yang akan diedit: ")
+			nama = readStringInput("Masukkan nama baru: ", "^[a-zA-Z ]+$")
+			partai = readStringInput("Masukkan partai baru: ", "^.+$")
 			p.EditCalon(index-1, nama, partai)
 		case 3:
 			var index int
 			p.TampilkanDaftarCalon()
-			fmt.Print("Masukkan nomor calon yang akan dihapus: ")
-			fmt.Scan(&index)
+			index = readIntInput("Masukkan nomor calon yang akan dihapus: ")
 			p.HapusCalon(index - 1)
 		case 4:
 			var waktuMulai, waktuSelesai string
-			fmt.Print("Masukkan waktu mulai (DD/MM/YYYY): ")
-			fmt.Scan(&waktuMulai)
-			fmt.Print("Masukkan waktu selesai (DD/MM/YYYY): ")
-			fmt.Scan(&waktuSelesai)
+			waktuMulai = readStringInput("Masukkan waktu mulai (DD/MM/YYYY): ", "^[0-9]{2}/[0-9]{2}/[0-9]{4}$")
+			waktuSelesai = readStringInput("Masukkan waktu selesai (DD/MM/YYYY): ", "^[0-9]{2}/[0-9]{2}/[0-9]{4}$")
 			p.AturWaktuPemilihan(waktuMulai, waktuSelesai)
 		case 5:
 			p.TampilkanDaftarCalon()
@@ -195,17 +216,14 @@ func menuPemilih(p *Pemilihan) {
 		fmt.Println("3. Cari Calon Berdasarkan Nama")
 		fmt.Println("4. Tampilkan Pemenang")
 		fmt.Println("5. Keluar")
-		fmt.Print("Pilih opsi: ")
-		fmt.Scan(&pilihan)
+		pilihan = readIntInput("Pilih opsi: ")
 
 		switch pilihan {
 		case 1:
 			if p.ApakahPemilihanBuka() {
 				var nama, pilihanCalon string
-				fmt.Print("Masukkan nama Anda: ")
-				fmt.Scan(&nama)
-				fmt.Print("Masukkan nama calon yang dipilih: ")
-				fmt.Scan(&pilihanCalon)
+				nama = readStringInput("Masukkan nama Anda: ", "^[a-zA-Z ]+$")
+				pilihanCalon = readStringInput("Masukkan nama calon yang dipilih: ", "^[a-zA-Z ]+$")
 				p.TambahPemilih(nama, pilihanCalon)
 			} else {
 				fmt.Println("Pemilihan belum dibuka.")
@@ -214,8 +232,7 @@ func menuPemilih(p *Pemilihan) {
 			p.UrutkanBerdasarkanNama()
 		case 3:
 			var nama string
-			fmt.Print("Masukkan nama calon: ")
-			fmt.Scan(&nama)
+			nama = readStringInput("Masukkan nama calon: ", "^[a-zA-Z ]+$")
 			p.CariBerdasarkanNamaCalon(nama)
 		case 4:
 			p.TampilkanPemenang()
@@ -236,8 +253,7 @@ func main() {
 		fmt.Println("1. Admin")
 		fmt.Println("2. Pemilih")
 		fmt.Println("3. Keluar")
-		fmt.Print("Pilih tipe pengguna: ")
-		fmt.Scan(&tipePengguna)
+		tipePengguna = readIntInput("Pilih tipe pengguna: ")
 
 		switch tipePengguna {
 		case 1:
